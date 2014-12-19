@@ -32,7 +32,9 @@ action :backup do
     day new_resource.day || "*"
     month new_resource.month || "*"
     weekday new_resource.weekday || "*"
-    mailto new_resource.mailto
+    if new_resource.mailto  
+      mailto new_resource.mailto
+    end  
     # if node['languages']['ruby'].empty?
     #   cmd = "/opt/chef/embedded/bin/backup perform -t #{new_resource.name} -c #{new_resource.base_dir}/config.rb"
     if new_resource.gem_bin_dir
@@ -43,8 +45,8 @@ action :backup do
     command cmd + ( new_resource.tmp_path ? " --tmp-path #{new_resource.tmp_path}" : "" ) +  ( new_resource.cron_log ? " >> #{new_resource.cron_log} 2>&1" : "" )
     if new_resource.cron_path
       path new_resource.cron_path
-    else
-      path node['languages']['ruby']['bin_dir']
+    # else
+    #   path node['languages']['ruby']['bin_dir']
     end
     action :create
   end
