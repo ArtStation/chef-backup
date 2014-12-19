@@ -99,4 +99,25 @@ data_path '<%= @data_path %>'
 #     mail.encryption           = :starttls
 #   end
 
+<%- if node.backup.notifiers.has_key?('mail') %>
+
+Notifier::Mail.defaults do |mail|
+
+  mail.on_success           = '<%= "#{node['backup']['notifiers']['mail']['on_success']}" %>'
+  mail.on_warning           = '<%= "#{node['backup']['notifiers']['mail']['on_warning']}" %>'
+  mail.on_failure           = '<%= "#{node['backup']['notifiers']['mail']['on_failure']}" %>'
+
+  mail.from                 = '<%= "#{node['backup']['notifiers']['mail']['from']}" %>'
+  mail.to                   = '<%= "#{node['backup']['notifiers']['mail']['to']}" %>'
+  mail.address              = '<%= "#{node['backup']['notifiers']['mail']['address']}" %>'
+  mail.port                 = <%= "#{node['backup']['notifiers']['mail']['port']}" %>
+  mail.domain               = '<%= "#{node['backup']['notifiers']['mail']['domain']}" %>'
+  mail.user_name            = '<%= "#{node['backup']['notifiers']['mail']['user_name']}" %>'
+  mail.password             = '<%= "#{node['backup']['notifiers']['mail']['password']}" %>'
+  mail.authentication       = '<%= "#{node['backup']['notifiers']['mail']['authentication']}" %>'
+  mail.encryption           = <%= "#{node['backup']['notifiers']['mail']['encryption']}" %>
+end
+
+<%- end %>
+
 
