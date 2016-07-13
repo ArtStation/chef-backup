@@ -3,7 +3,7 @@
 ##
 # Backup Generated: <%= @name %>
 # Once configured, you can run the backup with the following command:
-# 
+#
 # $ backup perform -t <%= @name %> [-c <path_to_configuration_file>]
 #
 Model.new(:<%= @name %>, '<%= @description %>') do
@@ -16,13 +16,20 @@ Model.new(:<%= @name %>, '<%= @description %>') do
   #
   split_into_chunks_of <%= @split_into_chunks_of %>
 <% end %>
+<% if @notify_by %>
+  notify_by <%= @notify_by["method"] %> do |<%= @notify_by["method"].downcase %>|
+  <% @notify_by["settings"].each_pair do |k,v| %>
+    <%= k %> = <%= ((v.is_a? String) ? "\"#{v}\"" : v) %>
+  <% end %>
+  end
+<% end %>
 
 <% if @encrypt_with %>
   encrypt_with <%= @encrypt_with["engine"] %> do |encryption|
   <% @encrypt_with["settings"].each_pair do |k,v| %>
     <%= k %> = <%= ((v.is_a? String) ? "\"#{v}\"" : v) %>
   <% end %>
-  end 
+  end
 <% end %>
 <% if @before_hook %>
   before do
@@ -43,10 +50,12 @@ Model.new(:<%= @name %>, '<%= @description %>') do
   <% end %>
   end
 <% end %>
-  ##
-  # Gzip [Compressor]
-  #
-  compress_with Gzip
+<% if @compress_with %>
+##
+# Gzip [Compressor]
+#
+compress_with <%= @compress_with %>
+<% end %>
   <% if @backup_type == "database" %>
   database <%= @database_type %> do |db|
   <% @options.each_pair do |k,v| %>
@@ -67,6 +76,30 @@ Model.new(:<%= @name %>, '<%= @description %>') do
     <% if @options["tar_options"] %>
     archive.tar_options '<%= @options["tar_options"] %>'
     <% end %>
+  end
+<% end %>
+
+<% if @sync_with %>
+  sync_with <%= @sync_with["syncer"] %> do |syncer|
+  <% @sync_with["settings"].each_pair do |k,v| %>
+    <% if v.is_a? String %>
+    <%= k %> = "<%= v %>"
+    <% elsif v.is_a? Symbol %>
+    <%= k %> = :<%= v %>
+    <% else %>
+    <%= k %> = <%= v %>
+    <% end %>
+  <% end %>
+    syncer.directories do |directory|
+    <% @options["add"].each do |v| %>
+      directory.add '<%= v %>'
+    <% end %>
+    <% if @options["exclude"] %>
+    <% @options["exclude"].each do |v| %>
+      directory.exclude '<%= v %>'
+    <% end %>
+    <% end %>
+    end
   end
 <% end %>
 end

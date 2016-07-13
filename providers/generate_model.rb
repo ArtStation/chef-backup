@@ -14,7 +14,7 @@ action :backup do
     source new_resource.options["source"] || "generic_model.conf.erb"
     cookbook new_resource.options["cookbook"] || "backup"
     variables({
-                :name => new_resource.name, 
+                :name => new_resource.name,
                 :options => new_resource.options,
                 :base_dir => new_resource.base_dir,
                 :split_into_chunks_of => new_resource.split_into_chunks_of,
@@ -23,18 +23,24 @@ action :backup do
                 :database_type => new_resource.database_type,
                 :store_with => new_resource.store_with,
                 :encrypt_with => new_resource.encrypt_with,
-                :after_hook => new_resource.after_hook
+                :compress_with => new_resource.compress_with,
+                :notify_by => new_resource.notify_by,
+                :before_hook => new_resource.before_hook,
+                :after_hook => new_resource.after_hook,
+                :sync_with => new_resource.sync_with
               })
   end
   cron_d new_resource.name do
-    hour new_resource.hour || "1" 
+    hour new_resource.hour || "1"
     minute new_resource.minute || "*"
     day new_resource.day || "*"
     month new_resource.month || "*"
     weekday new_resource.weekday || "*"
-    if new_resource.mailto  
+    if new_resource.mailto
       mailto new_resource.mailto
-    end  
+    else
+      Chef::Log.warn 'No MAILTO defined'
+    end
     # if node['languages']['ruby'].empty?
     #   cmd = "/opt/chef/embedded/bin/backup perform -t #{new_resource.name} -c #{new_resource.base_dir}/config.rb"
     if new_resource.gem_bin_dir
@@ -45,8 +51,9 @@ action :backup do
     command cmd + ( new_resource.tmp_path ? " --tmp-path #{new_resource.tmp_path}" : "" ) +  ( new_resource.cron_log ? " >> #{new_resource.cron_log} 2>&1" : "" )
     if new_resource.cron_path
       path new_resource.cron_path
-    # else
-    #   path node['languages']['ruby']['bin_dir']
+   #   path "#{new_resource.cron_path}:#{node['languages']['ruby']['bin_dir']}"
+   # else
+   #   path node['languages']['ruby']['bin_dir']
     end
     action :create
   end

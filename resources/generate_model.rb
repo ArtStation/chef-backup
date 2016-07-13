@@ -31,7 +31,7 @@ attribute :mailto, :kind_of => String, :default => nil
 # sets the tmp path for the backup
 attribute :tmp_path, :kind_of => String, :default => nil
 # sets the PATH variable in the crontab to specify who should get the output of the crontab run
-attribute :cron_path, :kind_of => String, :default => nil
+attribute :cron_path, :kind_of => String, :default => "/usr/bin:/bin:/usr/local/bin"
 # Log file for redirecting the cron job output
 attribute :cron_log, :kind_of => String, :default => nil
 # Before hook runs ruby code just after 'Backup' logs that the backup has started, before any procedures are performed
@@ -40,7 +40,12 @@ attribute :before_hook, :kind_of => String, :default => nil
 attribute :after_hook, :kind_of => String, :default => nil
 # encrypt_with.  Ruby Hash to specify how to encrypt your backups
 attribute :encrypt_with, :kind_of => Hash
-
+# Select the Compression Method (or disable it)
+attribute :compress_with
+# notify_by.  Ruby hash to specify how to notify your backups are completed
+attribute :notify_by, :kind_of => Hash
+# Enable and configure backup Syncers
+attribute :sync_with, :kind_of => Hash
 
 def initialize(*args)
   super
